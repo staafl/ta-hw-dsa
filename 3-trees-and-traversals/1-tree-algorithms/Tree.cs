@@ -214,7 +214,7 @@ class Tree
 
     public IEnumerable<IEnumerable<Node>> AllPathsOfSum(int sum)
     {
-        return this.Nodes.SelectMany(root => AllPathsOfSum(root, sum, true).Select(s => s.ToArray()).ToArray());
+        return this.Nodes.SelectMany(root => AllPathsOfSum(root, sum, true));
     }
 
     IEnumerable<IEnumerable<Node>> AllPathsOfSum(Node node, int sum, bool allowFork)
