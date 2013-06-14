@@ -1,0 +1,31 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "1-priority-queue", "1-priority-queue\1-priority-queue.csproj", "{F30ACFB1-1CF0-48E5-A7CD-EEA7FFC631BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2-product-range", "2-product-range\2-product-range.csproj", "{07F5B819-91D4-4756-AA17-17EFE690E9F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "3-word-count", "3-word-count\3-word-count.csproj", "{6ED95BB2-DABE-406C-A5C9-6AD50B28D74F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F30ACFB1-1CF0-48E5-A7CD-EEA7FFC631BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F30ACFB1-1CF0-48E5-A7CD-EEA7FFC631BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F30ACFB1-1CF0-48E5-A7CD-EEA7FFC631BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F30ACFB1-1CF0-48E5-A7CD-EEA7FFC631BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07F5B819-91D4-4756-AA17-17EFE690E9F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07F5B819-91D4-4756-AA17-17EFE690E9F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07F5B819-91D4-4756-AA17-17EFE690E9F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07F5B819-91D4-4756-AA17-17EFE690E9F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6ED95BB2-DABE-406C-A5C9-6AD50B28D74F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6ED95BB2-DABE-406C-A5C9-6AD50B28D74F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6ED95BB2-DABE-406C-A5C9-6AD50B28D74F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6ED95BB2-DABE-406C-A5C9-6AD50B28D74F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
