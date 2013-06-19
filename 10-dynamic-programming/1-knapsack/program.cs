@@ -27,8 +27,6 @@ class Program
 
     }
 
-
-
     public static List<Item> FindOptimalSolutionDynamic(Item[] items, int capacity)
     {
         // for the recursive implementation
@@ -154,7 +152,6 @@ class Program
         return bestItems;
     }
 
-
     public static List<Item> FindOptimalSolutionRecursive(Item[] items, int capacity)
     {
         // base cases
@@ -168,14 +165,15 @@ class Program
         var x = items.Length - 1;
         var currentItem = items[x];
 
+        var bestWhenDropping = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity);
+
         if (capacity < currentItem.Weight)
-            return new List<Item>();
+            return bestWhenDropping;
 
         var bestWhenTaking = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity - currentItem.Weight);
 
         bestWhenTaking.Add(currentItem);
 
-        var bestWhenDropping = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity);
 
         var valueWhenTaking = bestWhenTaking.Sum(i => i.Value);
         var valueWhenDropping = bestWhenDropping.Sum(i => i.Value);
@@ -189,7 +187,6 @@ class Program
             return bestWhenDropping;
         }
     }
-
 
     // hacky debugging helper
     public static void PrintMatrix(int[,] mx, int untilRow, Item[] items)
