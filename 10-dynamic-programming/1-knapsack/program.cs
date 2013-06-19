@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
 class Program
 {
     static void Main()
     {
-        Item[] myItems = new Item[]{
+        // not the same as in presentation
+        // best solution: ham + whiskey + nuts
+
+        Item[] items = new Item[]{
                                     new Item("beer", 3, 2),
                                     new Item("vodka", 8, 12),
                                     new Item("cheese", 4, 5),
@@ -13,10 +17,13 @@ class Program
                                     new Item("ham", 2, 4),
                                     new Item("wiskey", 7, 13)
         };
-        int myBagCapacity = 10;
 
-        List<Item> result = FindOptimalSolution(myItems, myBagCapacity);
+        int capacity = 10;
+
+        var result = FindOptimalSolution(items, capacity);
+
         Console.WriteLine("Best choice: ");
+
         Console.WriteLine(String.Join("\n", result.Select(r => r.Name)));
 
     }
@@ -25,7 +32,8 @@ class Program
 
     public static List<Item> FindOptimalSolution(Item[] items, int capacity)
     {
-        // for the recursive case
+        // for the recursive implementation
+
         if (capacity == 0)
             return new List<Item>();
 
@@ -162,19 +170,7 @@ class Program
         return bestItems;
     }
 
-    public struct Item
-    {
-        public Item(string name, int weight, int value)
-            : this()
-        {
-            this.Name = name;
-            this.Weight = weight;
-            this.Value = value;
-        }
-        public string Name { get; private set; }
-        public int Weight { get; private set; }
-        public int Value { get; private set; }
-    }
+
 
     // hacky debugging helper
     public static void PrintMatrix(int[,] mx, int untilRow, Item[] items)
