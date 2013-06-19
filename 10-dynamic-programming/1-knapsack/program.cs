@@ -20,17 +20,16 @@ class Program
 
         int capacity = 10;
 
-        var result = FindOptimalSolution(items, capacity);
-
         Console.WriteLine("Best choice: ");
 
-        Console.WriteLine(String.Join("\n", result.Select(r => r.Name)));
+        Console.WriteLine("Dynamic: " + String.Join(" ", FindOptimalSolutionDynamic(items, capacity).Select(r => r.Name)));
+        Console.WriteLine("Recursive: " + String.Join(" ", FindOptimalSolutionRecursive(items, capacity).Select(r => r.Name)));
 
     }
 
 
 
-    public static List<Item> FindOptimalSolution(Item[] items, int capacity)
+    public static List<Item> FindOptimalSolutionDynamic(Item[] items, int capacity)
     {
         // for the recursive implementation
 
@@ -97,24 +96,9 @@ class Program
 
                 // decide whether we take or drop the current item
 
-                int valueWhenDropping, valueWhenTaking;
 
-                const bool RECURSION = true;
-
-                if (RECURSION)
-                {
-                    // recursive variant
-
-                    valueWhenDropping = FindOptimalSolution(items.Take(x).ToArray(), y).Sum(i => i.Value);
-                    valueWhenTaking = FindOptimalSolution(items.Take(x).ToArray(), y - currentItem.Weight).Sum(i => i.Value) + currentItem.Value;
-                }
-                else
-                {
-                    // 'dynamic' variant
-
-                    valueWhenDropping = valuesArray[x, y];
-                    valueWhenTaking = valuesArray[x, y - currentItem.Weight] + currentItem.Value;
-                }
+                int valueWhenDropping = valuesArray[x, y];
+                int valueWhenTaking = valuesArray[x, y - currentItem.Weight] + currentItem.Value;
 
                 // which is better?
 
@@ -170,6 +154,41 @@ class Program
         return bestItems;
     }
 
+
+    public static List<Item> FindOptimalSolutionRecursive(Item[] items, int capacity)
+    {
+        // base cases
+
+        if (capacity <= 0 || items.Length == 0)
+            return new List<Item>();
+
+
+        // decide whether we take or drop the current item
+
+        var x = items.Length - 1;
+        var currentItem = items[x];
+
+        if (capacity < currentItem.Weight)
+            return new List<Item>();
+
+        var bestWhenTaking = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity - currentItem.Weight);
+
+        bestWhenTaking.Add(currentItem);
+
+        var bestWhenDropping = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity);
+
+        var valueWhenTaking = bestWhenTaking.Sum(i => i.Value);
+        var valueWhenDropping = bestWhenDropping.Sum(i => i.Value);
+
+        if (valueWhenTaking > valueWhenDropping)
+        {
+            return bestWhenTaking;
+        }
+        else
+        {
+            return bestWhenDropping;
+        }
+    }
 
 
     // hacky debugging helper
