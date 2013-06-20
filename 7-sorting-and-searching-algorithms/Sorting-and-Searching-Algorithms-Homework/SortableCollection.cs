@@ -30,19 +30,75 @@
             sorter.Sort(this.items);
         }
 
+        // time: O(n)
+        // space: O(1)
         public bool LinearSearch(T item)
         {
-            throw new NotImplementedException();
+            foreach (var elem in this.items)
+                if (elem.SafeEquals(item))
+                    return true;
+            return false;
         }
 
+        // time: O(log n)
+        // space: O(1)
         public bool BinarySearch(T item)
         {
-            throw new NotImplementedException();
+            var len = items.Count;
+            if (len == 0)
+                return false;
+            var start = 0;
+
+            var comparer = Comparer<T>.Default;
+
+            while (true)
+            {
+                var split = len / 2 + start;
+                var atSplit = this.items[split];
+                if (atSplit.SafeEquals(item))
+                {
+                    return true;
+                }
+
+                if (comparer.Compare(atSplit, item) < 0)
+                {
+                    len = len - (split - start + 1);
+                    start = split + 1;
+                }
+                else
+                {
+                    len = split - start;
+                }
+
+                if (len < 1)
+                {
+                    return false;
+                }
+
+            }
+
         }
 
+        // take to class scope to avoid duplicate-seed issues when used 
+        // in a loop etc
+        static readonly Random rand = new Random();
+
+        // time: O(n)
+        // space: O(1)
         public void Shuffle()
         {
-            throw new NotImplementedException();
+            // http://en.wikipedia.org/wiki/Fisher–Yates_shuffle
+
+            // for element X, choose position [X..length) and swap
+
+            for (int ii = 0; ii < this.items.Count; ++ii)
+            {
+                var position = rand.Next(ii, this.items.Count);
+                this.items.Swap(ii, position);
+
+                // note that this is vulnerable to the entropy of the random generator
+                // only a maximum of 12 items can be shuffled uniformly using a 32 bit seed
+            }
         }
 
         public void PrintAllItemsOnConsole()
