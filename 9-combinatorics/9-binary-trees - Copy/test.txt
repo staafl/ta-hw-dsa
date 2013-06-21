@@ -1,0 +1,4 @@
+bin\debug\9-binary-trees.exe
+
+Tests\*.in.txt
+Tests\*.out.txt

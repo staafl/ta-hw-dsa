@@ -22,12 +22,12 @@ class Program
 
         Console.WriteLine("Best choice: ");
 
-        Console.WriteLine("Dynamic: " + String.Join(" ", FindOptimalSolutionDynamic(items, capacity).Select(r => r.Name)));
-        Console.WriteLine("Recursive: " + String.Join(" ", FindOptimalSolutionRecursive(items, capacity).Select(r => r.Name)));
+        Console.WriteLine("Dynamic: " + String.Join(" ", KnapsackDynamic(items, capacity).Select(r => r.Name)));
+        Console.WriteLine("Recursive: " + String.Join(" ", KnapsackRecursive(items, capacity).Select(r => r.Name)));
 
     }
 
-    public static List<Item> FindOptimalSolutionDynamic(Item[] items, int capacity)
+    public static List<Item> KnapsackDynamic(Item[] items, int capacity)
     {
         // for the recursive implementation
 
@@ -94,7 +94,6 @@ class Program
 
                 // decide whether we take or drop the current item
 
-
                 int valueWhenDropping = valuesArray[x, y];
                 int valueWhenTaking = valuesArray[x, y - currentItem.Weight] + currentItem.Value;
 
@@ -152,25 +151,24 @@ class Program
         return bestItems;
     }
 
-    public static List<Item> FindOptimalSolutionRecursive(Item[] items, int capacity)
+    public static List<Item> KnapsackRecursive(Item[] items, int capacity)
     {
         // base cases
 
         if (capacity <= 0 || items.Length == 0)
             return new List<Item>();
 
-
         // decide whether we take or drop the current item
 
         var x = items.Length - 1;
         var currentItem = items[x];
 
-        var bestWhenDropping = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity);
+        var bestWhenDropping = KnapsackRecursive(items.Take(x).ToArray(), capacity);
 
         if (capacity < currentItem.Weight)
             return bestWhenDropping;
 
-        var bestWhenTaking = FindOptimalSolutionRecursive(items.Take(x).ToArray(), capacity - currentItem.Weight);
+        var bestWhenTaking = KnapsackRecursive(items.Take(x).ToArray(), capacity - currentItem.Weight);
 
         bestWhenTaking.Add(currentItem);
 

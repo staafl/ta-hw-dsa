@@ -1,0 +1,1 @@
+@"D:\_lib\_projects\minor\runtest\build\debug\runtest.exe" test.txt
