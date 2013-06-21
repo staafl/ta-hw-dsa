@@ -79,39 +79,37 @@ class Program
 
         // going right means skpping from input / deleting from string
 
-        for (int pi = 0; pi <= input.Length; ++pi)
+        for (int pi = 1; pi <= input.Length; ++pi)
         {
             table[0, pi] = pi * COST_DELETE;
         }
 
         // going down means skipping from pattern / inserting into string
 
-        table[1, 0] = COST_INSERT;
 
         // fill the table
 
-        for (int pp = 1; pp <= pattern.Length; ++pp)
-        {
-            table[1, 0] = pp * COST_INSERT;
+        int pp;
+        for (pp = 1; pp <= pattern.Length; ++pp)
+        {   
+            int thisRow = pp % 2;
+            int prevRow = 1 - thisRow;
+            
+            table[thisRow, 0] = pp * COST_INSERT;
 
             for (int pi = 1; pi <= input.Length; ++pi)
             {
                 decimal cost = (input[pi - 1] == pattern[pp - 1]) ? 0 : COST_REPLACE;
 
-                decimal minCostPi = table[1, pi - 1] + COST_DELETE;
-                decimal minCost2 = table[0, pi - 1] + cost;
-                decimal minCostPp = table[0, pi] + COST_INSERT;
+                decimal minCostPi = table[thisRow, pi - 1] + COST_DELETE;
+                decimal minCost2 = table[prevRow, pi - 1] + cost;
+                decimal minCostPp = table[prevRow, pi] + COST_INSERT;
 
-                table[1, pi] = Math.Min(Math.Min(minCostPp, minCostPi), minCost2);
+                table[thisRow, pi] = Math.Min(Math.Min(minCostPp, minCostPi), minCost2);
             }
 
-            // shift row up
-            for (int ii = 0; ii <= pattern.Length; ++ii)
-            {
-                table[0, ii] = table[1, ii];
-            }
         }
 
-        return table[1, input.Length];
+        return table[1 - (pp % 2), input.Length];
     }
 }
