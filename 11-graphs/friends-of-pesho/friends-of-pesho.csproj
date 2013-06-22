@@ -41,7 +41,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Heap.cs" />
     <Compile Include="libcs.cs" />
     <Compile Include="PriorityQueue.cs" />
     <Compile Include="program.cs" />

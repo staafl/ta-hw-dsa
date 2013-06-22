@@ -12,11 +12,14 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.SetIn(new StringReader(
+        if (args.Length != 0)
+        {
+            Console.SetIn(new StringReader(
 @"3 2 1 
 1
 1 2 1
 3 2 2"));
+        }
 
         var split = GetInts();
 
@@ -59,7 +62,7 @@ class Program
             }
         }
 
-        Console.WriteLine(minTree);
+        Console.Write(minTree);
     }
 
     // a standard implementation of Dijkstra's algorithm using a priority queue
@@ -76,12 +79,13 @@ class Program
 
         // return value
         int ret = 0;
-        int edgeCount = 0;
         
-        while (edgeCount < verticeCount - hospitals.Count())
+        var tree = new HashSet<int>();
+        int housesAdded = 0;
+        int totalHouses = verticeCount - hospitals.Count();
+        
+        while (housesAdded < totalHouses)
         {
-            edgeCount += 1;
-            
             // edge nearest to 'hospital'
             
             var min = distances.DequeueWithPriority();
@@ -95,16 +99,23 @@ class Program
             // sum the distance to the root of all nodes that aren't
             // hospitals
             
-            if (!hospitals.Contains(v1))
+            if (!hospitals.Contains(v1)) 
+            {
+                housesAdded += 1;
                 ret += weight;
+            }
+            
+            tree.Add(v1);
 
-            // update the priorities of all edges incident on the vertex
+            // update the priorities of all external neighbours of the vertex
             // we've just added
             
             foreach (var adj in graph[v1])
             {
                 var v2 = adj.Item1;
                 if (v2 == hospital)
+                    continue;
+                if (tree.Contains(v2))
                     continue;
 
                 var priority = distances.PriorityOrDefault(v2, int.MaxValue);

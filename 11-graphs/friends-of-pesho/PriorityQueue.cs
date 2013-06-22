@@ -2,17 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-class PriorityQueue<P, V> : IEnumerable<V>
+class PriorityQueue<P, V> : IEnumerable<Tuple<P,V>>
 {
-    readonly Heap<Tuple<P, V>> heap;
-    readonly Dictionary<V,P> priorities;
+    readonly SortedSet<Tuple<P, V>> set;
+    readonly Dictionary<V, Tuple<P, V>> entries;
 
+
+    
     public PriorityQueue(Comparison<P> comparison)
     {
         comparison.ThrowIfNull();
 
-        heap = new Heap<Tuple<P, V>>((t1, t2) => comparison(t1.Item1, t2.Item1));
-        priorities = new Dictionary<V,P>();
+        set = new SortedSet<Tuple<P, V>>(Comparer<Tuple<P, V>>.Create((e1, e2) => comparison(e1.Item1, e2.Item1)));
+        entries = new Dictionary<V,Tuple<P, V>>();
     }
 
     public PriorityQueue()
@@ -22,36 +24,37 @@ class PriorityQueue<P, V> : IEnumerable<V>
 
     public void Enqueue(P priority, V item)
     {
-        this.priorities.Add(item, priority);
-        this.heap.Add(Tuple.Create(priority, item));
+        var e = new Tuple<P, V>(priority, item);
+        this.entries.Add(item, e);
+        this.set.Add(e);
     }
 
     public void Rekey(V item, P newPriority)
     {
-        if (this.priorities.ContainsKey(item))
+        Tuple<P, V> e;
+        if (this.entries.TryGetValue(item, out e))
         {
-            var tuple = new Tuple<P, V>(this.priorities[item], item);
-            this.heap.Delete(tuple);
-            this.priorities.Remove(item);
+            this.set.Remove(e);
+            this.entries.Remove(item);
         }
         this.Enqueue(newPriority, item);
     }
     public P Priority(V item)
     {
-        return this.priorities[item];
+        return this.entries[item].Item1;
     }
     public P PriorityOrDefault(V item, P def)
     {
-        return this.priorities.GetOrDefault(item, def);
+        Tuple<P, V> e;
+        if (this.entries.TryGetValue(item, out e))
+        {
+            return e.Item1;
+        }
+        return def;
     }
     public V Dequeue()
     {
-        if (this.Count == 0)
-            throw new InvalidOperationException("PriorityQueue is empty.");
-
-        var ret = this.heap.ChopHead().Item2;
-        priorities.Remove(ret);
-        return ret;
+        return this.DequeueWithPriority().Item2;
     }
 
     public Tuple<P, V> DequeueWithPriority()
@@ -59,19 +62,15 @@ class PriorityQueue<P, V> : IEnumerable<V>
         if (this.Count == 0)
             throw new InvalidOperationException("PriorityQueue is empty.");
 
-        var ret = this.heap.ChopHead();
-                priorities.Remove(ret.Item2);
-        return ret;
+        var value = this.set.Min;
+        this.set.Remove(value);
+        entries.Remove(value.Item2);
+        return value;
     }
 
     public int Count
     {
-        get { return this.heap.Count; }
-    }
-
-    public int Capacity
-    {
-        get { return this.heap.Capacity; }
+        get { return this.entries.Count; }
     }
 
     public bool IsEmpty
@@ -79,15 +78,17 @@ class PriorityQueue<P, V> : IEnumerable<V>
         get { return this.Count == 0; }
     }
 
-    public IEnumerable<Tuple<P, V>> NotInOrder()
+    public IEnumerator<Tuple<P, V>> GetEnumerator()
     {
-        return heap;
+        return this.set.GetEnumerator();
     }
 
-    // slow
-    public IEnumerator<V> GetEnumerator()
+    public IEnumerable<V> Values
     {
-        return heap.OrderBy(t => t.Item1).Select(t => t.Item2).GetEnumerator();
+        get
+        {
+            return this.set.Select(e => e.Item2);
+        }
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
