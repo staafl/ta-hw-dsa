@@ -13,14 +13,25 @@ class PriorityQueue<P, V> : IEnumerable<Tuple<P, V>>
     {
         comparison.ThrowIfNull();
 
-        set = new SortedSet<Tuple<P, V>>(Comparer<Tuple<P, V>>.Create((e1, e2) => {
+        set = new SortedSet<Tuple<P, V>>(new EntryComparer(comparison));
+        entries = new Dictionary<V, Tuple<P, V>>();
+    }
+    
+    class EntryComparer : IComparer<Tuple<P, V>>
+    {
+        readonly Comparison<P> comparison;
+        
+        public EntryComparer(Comparison<P> comparison) {
+            this.comparison = comparison;
+        }
+        
+        public int Compare(Tuple<P, V> e1, Tuple<P, V>e2)
+        {
             var ret = comparison(e1.Item1, e2.Item1);
             if (ret == 0)
                 ret = Comparer<V>.Default.Compare(e1.Item2, e2.Item2);
             return ret;
-        })
-                );
-        entries = new Dictionary<V, Tuple<P, V>>();
+        }
     }
 
     public PriorityQueue()
@@ -111,9 +122,6 @@ class PriorityQueue<P, V> : IEnumerable<Tuple<P, V>>
     {
         return this.GetEnumerator();
     }
-
-
-
 
 
 }

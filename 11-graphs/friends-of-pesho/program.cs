@@ -15,7 +15,7 @@ class Program
     {
         if (args.Length != 0)
         {
-            Console.SetIn(new StreamReader("..\\..\\tests\\test.002.in.txt"));
+            Console.SetIn(new StreamReader("..\\..\\tests\\test.006.in.txt"));
             /*
                 (new StringReader(
 @"5 8 2
