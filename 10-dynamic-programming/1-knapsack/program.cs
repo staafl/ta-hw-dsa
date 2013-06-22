@@ -93,7 +93,10 @@ class Program
 
                 if (currentItem.Weight > y)
                 {
+                    // not enough space - just skip the current item
+
                     valuesArray[x + 1, y] = valuesArray[x, y];
+
                     continue;
                 }
 
