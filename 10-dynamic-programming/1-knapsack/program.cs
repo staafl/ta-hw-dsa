@@ -13,9 +13,11 @@ class Program
                                     new Item("beer", 3, 2),
                                     new Item("vodka", 8, 12),
                                     new Item("cheese", 4, 5),
-                                    new Item("nuts", 1, 1),
-                                    new Item("ham", 2, 4),
-                                    new Item("wiskey", 7, 13)
+                                    new Item("nuts", 1, 4),
+                                    new Item("ham", 2, 3),
+                                    new Item("whiskey", 8, 13),
+                                    new Item("bread", 1, 2),
+                                    new Item("melon", 3, 5),
         };
 
         int capacity = 10;
@@ -90,7 +92,10 @@ class Program
                 var currentItem = items[x + 1];
 
                 if (currentItem.Weight > y)
+                {
+                    valuesArray[x + 1, y] = valuesArray[x, y];
                     continue;
+                }
 
                 // decide whether we take or drop the current item
 
@@ -189,10 +194,10 @@ class Program
     // hacky debugging helper
     public static void PrintMatrix(int[,] mx, int untilRow, Item[] items)
     {
-        const int FOO = 8;
+        const int FOO = 17;
         // Console.Write(new string(' ', FOO));
 
-        Console.Write("R W  V |");
+        Console.Write("R ITEM     W  V |");
 
         for (int col = 0; col < mx.GetLength(1); ++col)
         {
@@ -204,6 +209,7 @@ class Program
         for (int row = 0; row <= untilRow; ++row)
         {
             Console.Write("{0} ", row);
+            Console.Write("{0:0} ", items[row].Name.PadRight(8, ' '));
             Console.Write("{0:0} ", items[row].Weight);
             Console.Write("{0:0} |", (items[row].Value + "").PadLeft(2, ' '));
 
