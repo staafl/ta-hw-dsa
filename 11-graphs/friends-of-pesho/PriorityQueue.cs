@@ -1,20 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-class PriorityQueue<P, V> : IEnumerable<Tuple<P,V>>
+using System.Diagnostics;
+class PriorityQueue<P, V> : IEnumerable<Tuple<P, V>>
 {
     readonly SortedSet<Tuple<P, V>> set;
     readonly Dictionary<V, Tuple<P, V>> entries;
 
 
-    
+
     public PriorityQueue(Comparison<P> comparison)
     {
         comparison.ThrowIfNull();
 
-        set = new SortedSet<Tuple<P, V>>(Comparer<Tuple<P, V>>.Create((e1, e2) => comparison(e1.Item1, e2.Item1)));
-        entries = new Dictionary<V,Tuple<P, V>>();
+        set = new SortedSet<Tuple<P, V>>(Comparer<Tuple<P, V>>.Create((e1, e2) => {
+            var ret = comparison(e1.Item1, e2.Item1);
+            if (ret == 0)
+                ret = Comparer<V>.Default.Compare(e1.Item2, e2.Item2);
+            return ret;
+        })
+                );
+        entries = new Dictionary<V, Tuple<P, V>>();
     }
 
     public PriorityQueue()
@@ -27,16 +33,25 @@ class PriorityQueue<P, V> : IEnumerable<Tuple<P,V>>
         var e = new Tuple<P, V>(priority, item);
         this.entries.Add(item, e);
         this.set.Add(e);
+
+        // Debug.Assert(this.set.Count == this.entries.Count);
     }
 
-    public void Rekey(V item, P newPriority)
+    public bool Delete(V item)
     {
         Tuple<P, V> e;
         if (this.entries.TryGetValue(item, out e))
         {
             this.set.Remove(e);
             this.entries.Remove(item);
+            return true;
         }
+
+        return false;
+    }
+    public void ChangePriority(V item, P newPriority)
+    {
+        this.Delete(item);
         this.Enqueue(newPriority, item);
     }
     public P Priority(V item)
@@ -54,7 +69,8 @@ class PriorityQueue<P, V> : IEnumerable<Tuple<P,V>>
     }
     public V Dequeue()
     {
-        return this.DequeueWithPriority().Item2;
+        var retValue = this.DequeueWithPriority().Item2;
+        return retValue;
     }
 
     public Tuple<P, V> DequeueWithPriority()
