@@ -2,6 +2,24 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
+public struct Tuple<P, V>
+{
+    public Tuple(P p, V v):this()
+    {
+        this.Item1 = p;
+        this.Item2 = v;
+    }
+    public P Item1 { get; private set; }
+    public V Item2 { get; private set; }
+}
+
+public static class Tuple
+{
+    public static Tuple<P, V> Create<P,V>(P p, V v)
+    {
+        return new Tuple<P, V>(p, v);
+    }
+}
 class PriorityQueue<P, V> : IEnumerable<Tuple<P, V>>
 {
     readonly SortedSet<Tuple<P, V>> set;
@@ -16,16 +34,17 @@ class PriorityQueue<P, V> : IEnumerable<Tuple<P, V>>
         set = new SortedSet<Tuple<P, V>>(new EntryComparer(comparison));
         entries = new Dictionary<V, Tuple<P, V>>();
     }
-    
+
     class EntryComparer : IComparer<Tuple<P, V>>
     {
         readonly Comparison<P> comparison;
-        
-        public EntryComparer(Comparison<P> comparison) {
+
+        public EntryComparer(Comparison<P> comparison)
+        {
             this.comparison = comparison;
         }
-        
-        public int Compare(Tuple<P, V> e1, Tuple<P, V>e2)
+
+        public int Compare(Tuple<P, V> e1, Tuple<P, V> e2)
         {
             var ret = comparison(e1.Item1, e2.Item1);
             if (ret == 0)
