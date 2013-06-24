@@ -1,57 +1,114 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
-class Heap<T> : IEnumerable<T>
+class MinHeap<T> : IEnumerable<T>
 {
-    T[] array = new T[15];
+    Dictionary<T,int> reverse = new Dictionary<T,int>();
+    
+    Tuple<int,T>[] array = new Tuple<int,T>[15];
 
-    readonly Comparison<T> comparison;
-
-    public Heap()
-        : this(Comparer<T>.Default.Compare)
+    public bool TrySetPriority(int priority, T elem)
     {
+        int oldIndex;
+        if (!this.reverse.TryGetValue(elem, out oldIndex))
+        {
+            MaybeExpand(1);
+
+            this.array[this.Count] = Tuple.Create(priority, elem);
+            this.reverse[elem] = this.Count;
+            this.Count += 1;
+            this.BubbleUp(this.Count - 1);
+
+            return true;
+        }
+
+        // fixme: unhardcode this
+
+        // Debug.Assert(array[ii].Item2.SafeEquals(elem));
+
+        if (priority > array[oldIndex].Item1)
+            return false;
+
+        this.array[oldIndex] = Tuple.Create(priority, elem);
+        this.BubbleUp(oldIndex);
+        this.BubbleDown(oldIndex);
+
+        return true;
+    }
+    
+    [Conditional("NOTHING")]
+    void Check()
+    {
+        
+        Debug.Assert(this.reverse.Count == this.Count);
+
+        foreach (var kvp in reverse)
+        {
+            Debug.Assert(array[kvp.Value].Item2.SafeEquals(kvp.Key));
+        }
+
+        CheckHeap();
+            
     }
 
-    public Heap(Comparison<T> comparison)
+    void CheckHeap(int ii = 0)
     {
-        comparison.ThrowIfNull();
-        this.comparison = comparison;
+        if (ii >= this.Count)
+            return;
+        Debug.Assert(DominatesChildren(ii));
+        CheckHeap(LeftChild(ii));
+        CheckHeap(RightChild(ii));
+
     }
 
-    public void Add(T elem)
+    public int Priority(T item)
     {
-        MaybeExpand(1);
+        return this.array[reverse[item]].Item1;
+    }
 
-        this.array[this.Count] = elem;
-        this.Count += 1;
-
-        this.BubbleUp(this.Count - 1);
+    public int PriorityOrDefault(T item, int def)
+    {
+        int ii;
+        if (!this.reverse.TryGetValue(item, out ii))
+            return def;
+            
+        return this.array[ii].Item1;
     }
 
     public bool Delete(T elem)
     {
-        for (int ii = 0; ii < this.Count; ++ii)
+        int ii;
+        if (!this.reverse.TryGetValue(elem, out ii))
+            return false;
+        
+        // Debug.Assert(array[ii].Item2.SafeEquals(elem));
+
+        this.reverse.Remove(elem);
+
+
+        if (ii == this.Count - 1)
         {
-            if (array[ii].SafeEquals(elem))
-            {
-                if (ii == this.Count - 1)
-                {
-                    this.Count -= 1;
-                    return true;
-                }
-
-                this.array[ii] = this.array[this.Count - 1];
-
-                this.Count -= 1;
-
-                BubbleDown(ii);
-
-                return true;
-            }
+            Check();
+            this.Count -= 1;
+            return true;
         }
 
-        return false;
+        var last = this.array[this.Count - 1];
+        this.array[ii] = last;
+        this.reverse[last.Item2] = ii;
+
+        this.Count -= 1;
+
+        this.BubbleDown(ii);
+        this.BubbleUp(ii);
+        
+        // reverse.Remove(elem);
+
+        Check();
+        return true;
+
     }
 
     public int Count
@@ -65,21 +122,37 @@ class Heap<T> : IEnumerable<T>
         get { return array.Length; }
     }
 
-    public T ChopHead()
+    public Tuple<int,T> ChopHeadWithPriority()
     {
-
         if (this.Count == 0)
             throw new InvalidOperationException("Heap is empty.");
 
         var ret = this.array[0];
 
-        this.array[0] = this.array[this.Count - 1];
+        Check();
 
-        this.BubbleDown(0);
+        this.reverse.Remove(ret.Item2);
+
+        // fixme - duplication with delete
+
+        if (this.Count > 1)
+        {
+            var last = this.array[this.Count - 1];
+            this.array[0] = last;
+            this.reverse[last.Item2] = 0;
+
+            this.BubbleDown(0);
+        }
 
         this.Count -= 1;
+        Check();
 
         return ret;
+    }
+
+    public T ChopHead()
+    {
+        return this.ChopHeadWithPriority().Item2;
     }
 
     public bool IsEmpty
@@ -87,13 +160,11 @@ class Heap<T> : IEnumerable<T>
         get { return this.Count == 0; }
     }
 
-
     bool Dominates(int who, int whom)
     {
         if (whom >= this.Count)
             return true;
-        return this.comparison(this.array[who],
-                               this.array[whom]) >= 0;
+        return this.array[who].Item1 <= this.array[whom].Item1;
     }
 
     bool DominatedByParent(int index)
@@ -106,8 +177,9 @@ class Heap<T> : IEnumerable<T>
 
     int SwapWithParent(int index)
     {
-        Swap(index, index / 2);
-        return index / 2;
+        var parent = Parent(index);
+        Swap(index, parent);
+        return parent;
     }
 
     bool DominatesChildren(int index)
@@ -115,13 +187,13 @@ class Heap<T> : IEnumerable<T>
         if (LeftChild(index) >= this.Count)
             return true;
 
-        if (DominatedByParent(LeftChild(index)))
+        if (!Dominates(index, LeftChild(index)))
             return false;
 
         if (RightChild(index) >= this.Count)
             return true;
 
-        if (DominatedByParent(RightChild(index)))
+        if (!Dominates(index, RightChild(index)))
             return false;
 
         return true;
@@ -148,9 +220,14 @@ class Heap<T> : IEnumerable<T>
 
     void Swap(int index1, int index2)
     {
-        var temp = this.array[index1];
-        this.array[index1] = this.array[index2];
-        this.array[index2] = temp;
+        var temp1 = this.array[index1];
+        var temp2 = this.array[index2];
+        
+        this.array[index1] = temp2;
+        this.array[index2] = temp1;
+        
+        this.reverse[temp1.Item2] = index2;
+        this.reverse[temp2.Item2] = index1;
     }
 
     int SwapWithDominantChild(int index)
@@ -186,7 +263,6 @@ class Heap<T> : IEnumerable<T>
 
         BubbleDown(largerChildIndex);
     }
-
 
     bool MaybeExpand(int d)
     {
