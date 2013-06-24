@@ -29,8 +29,11 @@ class MinHeap<T> : IEnumerable<T>
         // Debug.Assert(array[ii].Item2.SafeEquals(elem));
 
         if (priority > array[oldIndex].Item1)
+        {
+            // fixme: delete and reinsert
             return false;
-
+        }
+        
         this.array[oldIndex] = Tuple.Create(priority, elem);
         this.BubbleUp(oldIndex);
         this.BubbleDown(oldIndex);

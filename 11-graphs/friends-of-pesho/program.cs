@@ -5,9 +5,11 @@ using System.IO;
 using System.Linq;
 
 // no need to define whole classes
-//using Adjacency = System.Tuple<int, int>;
+
+// using Adjacency = System.Tuple<int, int>;
 // using AdjacencyList = System.Collections.Generic.List<System.Tuple<int, int>>;
 // using Graph = System.Collections.Generic.Dictionary<int, System.Collections.Generic.List<System.Tuple<int, int>>>;
+
 using Adjacency = Tuple<int, int>;
 using AdjacencyList = System.Collections.Generic.List<Tuple<int, int>>;
 using Graph = System.Collections.Generic.Dictionary<int, System.Collections.Generic.List<Tuple<int, int>>>;
