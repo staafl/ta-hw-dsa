@@ -5,13 +5,14 @@ using System.Linq;
 
 class MinHeap<T> : IEnumerable<T>
 {
-    Dictionary<T,int> reverse = new Dictionary<T,int>();
-    
-    Tuple<int,T>[] array = new Tuple<int,T>[15];
+    readonly Dictionary<T, int> reverse = new Dictionary<T, int>();
 
-    public bool TrySetPriority(int priority, T elem)
+    Tuple<int, T>[] array = new Tuple<int, T>[15];
+
+    public bool TrySetPriority(int priority, T elem, bool allowDownwardMotion = false)
     {
         int oldIndex;
+
         if (!this.reverse.TryGetValue(elem, out oldIndex))
         {
             MaybeExpand(1);
@@ -24,94 +25,40 @@ class MinHeap<T> : IEnumerable<T>
             return true;
         }
 
-        // fixme: unhardcode this
-
         // Debug.Assert(array[ii].Item2.SafeEquals(elem));
+
 
         if (priority > array[oldIndex].Item1)
         {
-            // fixme: delete and reinsert
-            return false;
+            if (!allowDownwardMotion)
+                return false;
+
+            this.array[oldIndex] = Tuple.Create(priority, elem);
+
+            this.BubbleDown(oldIndex);
         }
-        
-        this.array[oldIndex] = Tuple.Create(priority, elem);
-        this.BubbleUp(oldIndex);
-        this.BubbleDown(oldIndex);
-
-        return true;
-    }
-    
-    [Conditional("NOTHING")]
-    void Check()
-    {
-        
-        Debug.Assert(this.reverse.Count == this.Count);
-
-        foreach (var kvp in reverse)
+        else
         {
-            Debug.Assert(array[kvp.Value].Item2.SafeEquals(kvp.Key));
+            this.array[oldIndex] = Tuple.Create(priority, elem);
+
+            this.BubbleUp(oldIndex);
         }
 
-        CheckHeap();
-            
+        return false;
     }
 
-    void CheckHeap(int ii = 0)
-    {
-        if (ii >= this.Count)
-            return;
-        Debug.Assert(DominatesChildren(ii));
-        CheckHeap(LeftChild(ii));
-        CheckHeap(RightChild(ii));
-
-    }
-
-    public int Priority(T item)
+    public int GetPriority(T item)
     {
         return this.array[reverse[item]].Item1;
     }
 
-    public int PriorityOrDefault(T item, int def)
+    public int GetPriorityOrDefault(T item, int def)
     {
         int ii;
         if (!this.reverse.TryGetValue(item, out ii))
             return def;
-            
+
         return this.array[ii].Item1;
-    }
-
-    public bool Delete(T elem)
-    {
-        int ii;
-        if (!this.reverse.TryGetValue(elem, out ii))
-            return false;
-        
-        // Debug.Assert(array[ii].Item2.SafeEquals(elem));
-
-        this.reverse.Remove(elem);
-
-
-        if (ii == this.Count - 1)
-        {
-            Check();
-            this.Count -= 1;
-            return true;
-        }
-
-        var last = this.array[this.Count - 1];
-        this.array[ii] = last;
-        this.reverse[last.Item2] = ii;
-
-        this.Count -= 1;
-
-        this.BubbleDown(ii);
-        this.BubbleUp(ii);
-        
-        // reverse.Remove(elem);
-
-        Check();
-        return true;
-
     }
 
     public int Count
@@ -125,7 +72,7 @@ class MinHeap<T> : IEnumerable<T>
         get { return array.Length; }
     }
 
-    public Tuple<int,T> ChopHeadWithPriority()
+    public Tuple<int, T> ChopHeadWithPriority()
     {
         if (this.Count == 0)
             throw new InvalidOperationException("Heap is empty.");
@@ -135,8 +82,6 @@ class MinHeap<T> : IEnumerable<T>
         Check();
 
         this.reverse.Remove(ret.Item2);
-
-        // fixme - duplication with delete
 
         if (this.Count > 1)
         {
@@ -161,6 +106,31 @@ class MinHeap<T> : IEnumerable<T>
     public bool IsEmpty
     {
         get { return this.Count == 0; }
+    }
+
+    [Conditional("NOTHING")]
+    void Check()
+    {
+
+        Debug.Assert(this.reverse.Count == this.Count);
+
+        foreach (var kvp in reverse)
+        {
+            Debug.Assert(array[kvp.Value].Item2.SafeEquals(kvp.Key));
+        }
+
+        CheckHeap();
+
+    }
+
+    void CheckHeap(int ii = 0)
+    {
+        if (ii >= this.Count)
+            return;
+        Debug.Assert(DominatesChildren(ii));
+        CheckHeap(LeftChild(ii));
+        CheckHeap(RightChild(ii));
+
     }
 
     bool Dominates(int who, int whom)
@@ -225,10 +195,10 @@ class MinHeap<T> : IEnumerable<T>
     {
         var temp1 = this.array[index1];
         var temp2 = this.array[index2];
-        
+
         this.array[index1] = temp2;
         this.array[index2] = temp1;
-        
+
         this.reverse[temp1.Item2] = index2;
         this.reverse[temp2.Item2] = index1;
     }

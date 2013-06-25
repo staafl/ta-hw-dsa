@@ -14,50 +14,16 @@ using Adjacency = Tuple<int, int>;
 using AdjacencyList = System.Collections.Generic.List<Tuple<int, int>>;
 using Graph = System.Collections.Generic.Dictionary<int, System.Collections.Generic.List<Tuple<int, int>>>;
 
-public struct Tuple<P, V>
-{
-    public Tuple(P p, V v)
-        : this()
-    {
-        this.Item1 = p;
-        this.Item2 = v;
-    }
-    public P Item1 { get; private set; }
-    public V Item2 { get; private set; }
-    public override string ToString()
-    {
-        return "(" + Item1 + "," + Item2 + ")";
-    }
-}
 
-public static class Tuple
-{
-    public static Tuple<P, V> Create<P, V>(P p, V v)
-    {
-        return new Tuple<P, V>(p, v);
-    }
-}
 
 class Program
 {
     static void Main(string[] args)
     {
-        if (args.Length != 0)
-        {
-            Console.SetIn(new StreamReader("..\\..\\tests\\test.010.in.txt"));
-            /*
-                (new StringReader(
-@"5 8 2
-1 2
-1 2 5
-4 1 2
-1 3 1
-3 4 4
-4 5 1
-2 4 3
-5 2 1
-2 3 20"));*/
-        }
+        //if (args.Length != 0)
+        //{
+        //    Console.SetIn(new StreamReader("..\\..\\tests\\test.010.in.txt"));
+        //}
 
         var split = GetInts();
 
@@ -100,23 +66,20 @@ class Program
             }
         }
 
-        // Console.WriteLine(minHospital);
         Console.Write(minTree);
     }
 
-    // a standard implementation of Dijkstra's algorithm using a priority queue
+    // a *standard* implementation of Dijkstra's algorithm using a priority queue
     // with a minor modification for the problem
 
     static int GetTreeWeight(Graph graph, int hospital, int verticeCount, IEnumerable<int> hospitals)
     {
         var distances = new MinHeap<int>();
-        var parents = new Dictionary<int, int>();
 
         foreach (var adj in graph[hospital])
         {
             distances.TrySetPriority(adj.Item2, adj.Item1);
-            parents[adj.Item1] = hospital;
-        }
+        }   
 
         // return value
         int ret = 0;
@@ -158,14 +121,11 @@ class Program
                     continue;
                 if (tree.Contains(v2))
                 {
-                    // Debug.Assert(!distances.Delete(v2));
                     continue;
                 }
 
-                if (distances.TrySetPriority(weight + adj.Item2, v2))
-                {
-                    parents[v2] = v1;
-                }
+                // perhaps improve priority
+                distances.TrySetPriority(weight + adj.Item2, v2, false);
 
             }
         }
