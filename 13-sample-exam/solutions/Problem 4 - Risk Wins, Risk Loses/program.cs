@@ -52,7 +52,7 @@ class Program
         queue.Enqueue(start);
         
         int firstAtLevel = start;
-        bool hangingFirst = false;
+        bool firstChildFirstAtLevel = false;
         int level = -1;
         
         bool[] seen = new bool[MAX];
@@ -66,7 +66,7 @@ class Program
             bool isFirst = (firstAtLevel == now);
             if (isFirst)
             {
-                hangingFirst = true;
+                firstChildFirstAtLevel = true;
                 level += 1;
             }
             
@@ -82,9 +82,9 @@ class Program
                     {
                         seen[next] = true;
                         queue.Enqueue(next);
-                        if (hangingFirst)
+                        if (firstChildFirstAtLevel)
                         {
-                            hangingFirst = false;
+                            firstChildFirstAtLevel = false;
                             firstAtLevel = next;
                         }
                     }
