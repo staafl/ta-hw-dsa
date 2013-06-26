@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>C1F819AB-AC08-42FE-B013-8419745C01E8</ProjectGuid>
+    <ProjectGuid>{7D362E60-7820-4612-A867-6CC71084BDE8}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace></RootNamespace>
-    <AssemblyName>problem-3</AssemblyName>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>problem-4</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -36,6 +37,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PowerCollections">
+      <HintPath>.\PowerCollections.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
