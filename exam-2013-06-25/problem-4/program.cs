@@ -9,6 +9,9 @@ static class Program
     static void Main(string[] args)
     {
         int count;
+        
+        // debugging input
+        
         if (args.Length != 0 || Debugger.IsAttached)
         {
             Console.SetIn(new StringReader(
@@ -41,7 +44,9 @@ de
             Console.ReadLine();
             count = 10000;
         }
-        else { count = int.Parse(Console.ReadLine()); }
+        else { 
+            count = int.Parse(Console.ReadLine()); 
+        }
 
 
         var list = new List<string>();
@@ -54,15 +59,18 @@ de
             list.Add(l);
 
         }
+        
+        // create a hashset of preceding characters for every character
 
-
-        var chars = new List<Tuple<char, HashSet<char>>>();
+        var beforeHashes = new List<HashSet<char>>();
         var seen = new SortedSet<char>();
         for (int ii = 0; ii < 52; ++ii)
         {
-            chars.Add(Tuple.Create(IntToChar(ii), new HashSet<char>()));
+            chars.Add(new HashSet<char>());
         }
 
+        // fill the hashsets
+        
         foreach (var elem in list)
         {
             for (int ii = 0; ii < elem.Length; ++ii)
@@ -70,13 +78,15 @@ de
                 seen.Add(elem[ii]);
                 for (int jj = ii + 1; jj < elem.Length; ++jj)
                 {
-                    chars[CharToInt(elem[jj])].Item2.Add(elem[ii]);
+                    chars[CharToInt(elem[jj])].Add(elem[ii]);
                 }
             }
         }
 
         var ret = "";
-
+        
+        // topological sort
+        // inefficient version of kahn's algorithm
 
         while (seen.Count > 0)
         {
@@ -84,9 +94,7 @@ de
             {
                 if (ret.Contains(ch))
                     continue;
-                var t = chars[CharToInt(ch)];
-                var before = t.Item2;
-                // Debug.Assert(t.Item1 == ch);
+                var before = chars[CharToInt(ch)];
                 foreach (var elem in ret)
                     before.Remove(elem);
                 if (before.Count == 0)
@@ -101,21 +109,9 @@ de
         Console.WriteLine(ret);
 
         return;
-
-        ret = "";
-
-        foreach (var t in chars.OrderBy(t => t.Item2.Count).ThenBy(t => t.Item1))
-        {
-            if (seen.Contains(t.Item1))
-                ret += t.Item1;
-        }
-
-        Console.WriteLine(ret);
-
-
-        list.Sort((e1, e2) => e1.Length - e2.Length);
-        // list.Reverse();
-
+        
+        // 30/100 attempt using dynamic programming
+        // http://en.wikipedia.org/wiki/Shortest_common_supersequence
 
         var agg = new StringBuilder();
 
@@ -124,8 +120,9 @@ de
 
         Console.WriteLine(agg.ToString());
 
-        Console.ReadKey();
     }
+    
+    // letter to number 0..51
     static int CharToInt(char ch)
     {
         if (ch >= 'a')
@@ -133,12 +130,16 @@ de
         return ch - 'A';
     }
 
+    // number 0..51 to 'A'..'Z', 'a'..'z'
     static char IntToChar(int num)
     {
         if (num > 25)
             return (char)((num - 26) + 'a');
         return (char)(num + 'A');
     }
+    
+    // DO solution attempt
+    
     class Link
     {
         public int len;
